@@ -85,7 +85,6 @@ def post_comic_to_wall(access_token, group_id, user_id):
 
 if __name__ == "__main__":
     load_dotenv()
-    client_id = os.getenv('CLIENT_ID')
     user_id = os.getenv('USER_ID')
     access_token = os.getenv('ACCESS_TOKEN')
     group_id = os.getenv('GROUP_ID')
