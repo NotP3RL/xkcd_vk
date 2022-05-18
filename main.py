@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 from random import randint
@@ -5,7 +6,7 @@ from random import randint
 import requests
 from dotenv import load_dotenv
 
-from tools import download_picture
+from tools import VK_API_Error, download_picture, find_vk_api_error
 
 
 def download_random_comic():
@@ -31,6 +32,7 @@ def get_upload_url(access_token, group_id):
     url = 'https://api.vk.com/method/photos.getWallUploadServer'
     response = requests.get(url, params=params)
     response.raise_for_status()
+    find_vk_api_error(response.json())
     return response.json()['response']['upload_url']
 
 
@@ -42,6 +44,7 @@ def upload_file(access_token, group_id, comic_number):
         }
         response = requests.post(url, files=files)
         response.raise_for_status()
+        find_vk_api_error(response.json())
         return response.json()
 
 
@@ -57,6 +60,7 @@ def save_comic_in_album(access_token, group_id, photo_file):
     url = 'https://api.vk.com/method/photos.saveWallPhoto'
     response = requests.post(url, params=params)
     response.raise_for_status()
+    find_vk_api_error(response.json())
     return response.json()["response"][0]["id"]
 
 
@@ -75,6 +79,7 @@ def post_comic_to_wall(access_token, group_id, user_id):
     url = 'https://api.vk.com/method/wall.post'
     response = requests.post(url, params=params)
     response.raise_for_status()
+    find_vk_api_error(response.json())
     os.remove(f'images/{number}.png')
 
 
@@ -84,4 +89,9 @@ if __name__ == "__main__":
     user_id = os.getenv('USER_ID')
     access_token = os.getenv('ACCESS_TOKEN')
     group_id = os.getenv('GROUP_ID')
-    post_comic_to_wall(access_token, group_id, user_id)
+    try:
+        post_comic_to_wall(access_token, group_id, user_id)
+    except VK_API_Error as VK_Error:
+        logging.error(VK_Error)
+    except requests.exceptions.HTTPError as error:
+        logging.error(error)
