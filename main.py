@@ -80,7 +80,6 @@ def post_comic_to_wall(access_token, group_id, user_id):
     response = requests.post(url, params=params)
     response.raise_for_status()
     find_vk_api_error(response.json())
-    os.remove(f'images/{number}.png')
 
 
 if __name__ == "__main__":
@@ -94,3 +93,5 @@ if __name__ == "__main__":
         logging.error(VK_Error)
     except requests.exceptions.HTTPError as error:
         logging.error(error)
+    finally:
+        os.remove('images')
