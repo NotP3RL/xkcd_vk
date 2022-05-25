@@ -9,6 +9,9 @@ from dotenv import load_dotenv
 from tools import VK_API_Error, download_picture, find_vk_api_error
 
 
+IMAGE_PATH = "images"
+
+
 def download_random_comic():
     last_comic = requests.get('https://xkcd.com/info.0.json')
     last_comic.raise_for_status()
@@ -16,9 +19,10 @@ def download_random_comic():
     random_comic_url = f'https://xkcd.com/{random_comic_number}/info.0.json'
     random_comic = requests.get(random_comic_url)
     random_comic.raise_for_status()
+    os.makedirs(IMAGE_PATH, exist_ok=True)
     download_picture(
         random_comic.json()['img'],
-        f'images/{random_comic_number}.png'
+        f'{IMAGE_PATH}/{random_comic_number}.png'
     )
     return random_comic.json()['alt'], random_comic_number
 
@@ -64,9 +68,7 @@ def save_comic_in_album(access_token, group_id, photo_file):
     return response.json()["response"][0]["id"]
 
 
-def post_comic_to_wall(access_token, group_id, user_id):
-    text, number = download_random_comic()
-    photo_file = upload_file(access_token, group_id, number)
+def post_comic_to_wall(access_token, group_id, user_id, text, photo_file):
     params = {
         'access_token': access_token,
         'owner_id': -int(group_id),
@@ -88,10 +90,15 @@ if __name__ == "__main__":
     access_token = os.getenv('ACCESS_TOKEN')
     group_id = os.getenv('GROUP_ID')
     try:
-        post_comic_to_wall(access_token, group_id, user_id)
+        text, number = download_random_comic()
+        photo_file = upload_file(access_token, group_id, number)
+        post_comic_to_wall(access_token, group_id, user_id, text, photo_file)
     except VK_API_Error as VK_Error:
         logging.error(VK_Error)
     except requests.exceptions.HTTPError as error:
         logging.error(error)
     finally:
-        os.remove('images')
+        files_in_dir = os.listdir(IMAGE_PATH)
+        for file in files_in_dir:
+            os.remove(f'{IMAGE_PATH}/{file}')
+        os.rmdir(IMAGE_PATH)
