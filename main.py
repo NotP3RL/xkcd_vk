@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from tools import VK_API_Error, download_picture, find_vk_api_error
 
 
-IMAGE_PATH = "images"
+DIR_PATH = "images"
 
 
 def download_random_comic():
@@ -20,10 +20,10 @@ def download_random_comic():
     random_comic = requests.get(random_comic_url)
     random_comic.raise_for_status()
     random_comic = random_comic.json()
-    os.makedirs(IMAGE_PATH, exist_ok=True)
+    os.makedirs(DIR_PATH, exist_ok=True)
     download_picture(
         random_comic['img'],
-        f'{IMAGE_PATH}/{random_comic_number}.png'
+        f'{DIR_PATH}/{random_comic_number}.png'
     )
     return random_comic['alt'], random_comic_number
 
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     except requests.exceptions.HTTPError as error:
         logging.error(error)
     finally:
-        files_in_dir = os.listdir(IMAGE_PATH)
+        files_in_dir = os.listdir(DIR_PATH)
         for file in files_in_dir:
-            os.remove(f'{IMAGE_PATH}/{file}')
-        os.rmdir(IMAGE_PATH)
+            os.remove(f'{DIR_PATH}/{file}')
+        os.rmdir(DIR_PATH)
