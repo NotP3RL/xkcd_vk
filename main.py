@@ -104,6 +104,6 @@ if __name__ == "__main__":
         logging.error(error)
     finally:
         files_in_dir = os.listdir(DIR_PATH)
-        for filename in files_in_dir:
-            os.remove(f'{DIR_PATH}/{filename}')
+        filename = files_in_dir['0']
+        os.remove(f'{DIR_PATH}/{filename}')
         os.rmdir(DIR_PATH)
