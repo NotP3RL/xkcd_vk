@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from tools import VK_API_Error, download_picture, find_vk_api_error
 
 
-DIR_PATH = "images"
+DIR_PATH = './images'
 
 
 def download_random_comic():
@@ -104,6 +104,6 @@ if __name__ == "__main__":
         logging.error(error)
     finally:
         files_in_dir = os.listdir(DIR_PATH)
-        for file in files_in_dir:
-            os.remove(f'{DIR_PATH}/{file}')
+        for filename in files_in_dir:
+            os.remove(f'{DIR_PATH}/{filename}')
         os.rmdir(DIR_PATH)
